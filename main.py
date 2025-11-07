@@ -1,10 +1,10 @@
 # Como Alcaraz hizo con la clase BST, aquí igual se maneja todo el laberinto y se reparten la chamba
-from collections import deque as dq
-from random import randint
-from time import sleep
-import pygame
+from collections import deque as dq # Librería para la cola del BFS
+from random import randint # Librería para generar números aleatorios (no usada en esta versión)
+from time import sleep # Librería para hacer pausas en la animación
+import pygame # Librería para hacer la animación del laberinto
 
-class Maze:
+class Maze: # Clase que maneja todo el laberinto y su solución
     def __init__(self, input): # El constructor
         
         # Divido el laberinto por líneas para más fácil
@@ -144,7 +144,7 @@ class Maze:
         # Si después de explorar todas las direcciones no se encuentra ninguna solución, hay que quitar esa coordenada del camino (backtracking)
         # Esto es crucial para DFS: si este camino no funciona, lo descartamos
 
-        if not self.found:
+        if not self.found: # Si no se encontró la solución en esta rama
             self.path.pop()  # Removemos la última coordenada agregada (tu no has visto nada..., diría Skipper)
             # Nota: No hay que quitar el "ya visitado" porque ya pasamos por ahí y puede tender a recorrer ese camino 'legalmente' de manera indefinida. Le tienta irse por ahí
         
@@ -152,49 +152,51 @@ class Maze:
     def bfs_solve(self):
 
         #Regresa nada si no hay inicio o no hay final
-        if not self.start or not self.end:
-            return None
+        if not self.start or not self.end: # Verifica que existan posiciones de inicio y fin
+            return None # Si no hay A o B, no tiene caso buscar nada
 
         #Crea una matriz de celdas falsas para contar cuáles han sido visitadas de acuerdo al ancho y alto 
     
-        self.visited = [[False for _ in range(self.width)] for _ in range(self.height)]
+        self.visited = [[False for _ in range(self.width)] for _ in range(self.height)] # Reinicia la matriz de visitados para BFS
         
         # Hace el poderosísimo dairy queen y de una vez el mete el punto de inicio a sí mismo y a la matriz de visitados
         queue = dq([self.start])
-        self.visited[self.start[0]][self.start[1]] = True
+        self.visited[self.start[0]][self.start[1]] = True # Marca la celda de inicio como visitada
         
-        parent = {self.start: None}
+        parent = {self.start: None} # Diccionario para rastrear el camino (padre de cada celda)
 
-        while queue:
-            row, col = queue.popleft()
-            self.bfs_path.append((row,col))
+        while queue: # Mientras haya elementos en la cola
+            row, col = queue.popleft() # Saca el primer elemento de la cola para explorarlo
+            self.bfs_path.append((row,col)) # Guarda el camino de búsqueda BFS
             # Regresa un resultado cuando llega al final del laberinto y regresa el camino que siguió
-            if (row, col) == self.end:
-                # Reconstruct path
-                self.bfs_result = []
-                curr = self.end
-                while curr is not None:
-                    self.bfs_result.append(curr)
-                    curr = parent[curr]
-                self.bfs_result.reverse()
-                self.found = True
-                return self.bfs_result
+            
+            if (row, col) == self.end: # Si llegamos a B
+                # Reconstruir el camino desde el final hasta el inicio usando el diccionario de padres
+                self.bfs_result = [] # Lista para guardar el camino
+                curr = self.end # Empezamos desde el final
+                
+                while curr is not None: # Mientras no lleguemos al inicio
+                    self.bfs_result.append(curr) # Agrega la coordenada actual al camino
+                    curr = parent[curr] # Va retrocediendo por los padres hasta llegar al inicio
+                self.bfs_result.reverse() # Invierte el camino para que vaya de inicio a fin
+                self.found = True # Marca que se encontró la solución
+                return self.bfs_result # Regresa el camino encontrado
 
             directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
 
-            for d_row, d_col in directions:
-                new_row, new_col = row + d_row, col + d_col
+            for d_row, d_col in directions: # Por cada dirección posible
+                new_row, new_col = row + d_row, col + d_col # Calcula la nueva posición
 
                 # If con un friego de condiciones, el símbolo \ permite que se vean dentro de la pantalla
         
                 if 0 <= new_row < self.height and 0 <= new_col < self.width and \
-                   self.matrix[new_row][new_col] != '0' and not self.visited[new_row][new_col]:
+                    self.matrix[new_row][new_col] != '0' and not self.visited[new_row][new_col]: # Si está dentro de los límites, no es pared y no ha sido visitada
                     
-                    self.visited[new_row][new_col] = True
-                    queue.append((new_row, new_col))
-                    parent[(new_row, new_col)] = (row, col)
+                    self.visited[new_row][new_col] = True # Marca la celda como visitada
+                    queue.append((new_row, new_col)) # Agrega la nueva celda a la cola para explorarla después
+                    parent[(new_row, new_col)] = (row, col) # Guarda el padre para reconstruir el camino más tarde
         
-        return None
+        return None # Si no se encuentra camino, regresa None
 
 
     def print_path(self):
@@ -203,34 +205,37 @@ class Maze:
         if not self.path: # Pero si no se encontró un camino...
             print("No se encontró camino") # Bro, no hay nada que imprimir
             return
-        
+
         # Convertir cada coordenada a string en formato (fila,col)
         path_strings = [] # Lista vacía para guardar los strings
         for row, col in self.path: # Por cada coordenada en el camino
             coord_string = f"({row},{col})" # Formateamos la coordenada como string
             path_strings.append(coord_string) # Agregamos el string a la lista
+
+        print("DFS search path: ", self.dfs_path) # Debugea la ruta DFS
         
-        print("DFS search path: ", self.dfs_path)
         dfs_search_strings = [] # Lista vacía para guardar los strings
         for row, col in self.dfs_path: # Por cada coordenada en el camino
             coord_string = f"({row},{col})" # Formateamos la coordenada como string
             dfs_search_strings.append(coord_string) # Agregamos el string a la lista
-       
-        bfs_path_strings = []
+
+        print("BFS search path: ", self.bfs_path) # Debugea la ruta BFS
+        
+        bfs_path_strings = [] # Lista vacía para guardar los strings
         for row, col in self.bfs_result: # Por cada coordenada en el camino
             coord_string = f"({row},{col})" # Formateamos la coordenada como string
             bfs_path_strings.append(coord_string) # Agregamos el string a la lista
 
-        bfs_search_strings = []
+        bfs_search_strings = [] # Lista vacía para guardar los strings
         for row, col in self.bfs_path: # Por cada coordenada en el camino
             coord_string = f"({row},{col})" # Formateamos la coordenada como string
             bfs_search_strings.append(coord_string) # Agregamos el string a la lista
         
         # Appendeamos todas las coordenadas con guiones
-        dfs_search_path = "-".join(dfs_search_strings)
-        path_good = "-".join(path_strings)
-        path_bfs_good = "-".join(bfs_path_strings)
-        bfs_search_path = "-".join(bfs_search_strings)
+        dfs_search_path = "-".join(dfs_search_strings) # Une los strings con guiones
+        path_good = "-".join(path_strings) # Une los strings con guiones
+        path_bfs_good = "-".join(bfs_path_strings) # Une los strings con guiones
+        bfs_search_path = "-".join(bfs_search_strings) # Une los strings con guiones
         
         
         # Imprimimos el resultado
@@ -245,7 +250,7 @@ class Maze:
         return self.bfs_result  # Retorna el camino BFS encontrado
     
 
-    def main(self):
+    def main(self): # Función principal para la animación con Pygame
         pygame.init() # Inicializa pygame lol
         pantalla = pygame.display.set_mode((1000,1000)) # Tamaño de la ventana en píxeles
         rect_height = 1000/self.height # Tamaño de cada casilla en altura "Y"
@@ -267,6 +272,7 @@ class Maze:
         path_scaled = pygame.transform.scale(path_img, tamano_casilla) # Escala la imagen del camino usando la tupla de tamaño_casilla
         castle_scaled = pygame.transform.scale(castle_img, tamano_casilla) # Escala la imagen del castillo usando la tupla de tamaño_casilla
         
+        
         # Recorrido por el camino BFS
         print("Recorrido por BFS")
         pantalla.fill((115, 214, 41)) # Fondo verde pasto para reiniciar la pantalla
@@ -286,7 +292,7 @@ class Maze:
                     pantalla.blit(castle_scaled, (x, y)) # Dibuja castillo
         
         pygame.display.update() # Actualiza la pantalla
-        sleep(0.8) # Pausa para que se vea bien
+        sleep(0.5) # Pausa para que se vea bien
         
         # Anima el recorrido
         for i in range(len(self.bfs_path)): # Por cada paso en el camino BFS
@@ -296,9 +302,10 @@ class Maze:
             
             pantalla.blit(mario_scaled, (x, y)) # Dibuja a Mario en la posición actual
             pygame.display.update() # Actualiza la pantalla
-            sleep(0.05) # Pausa para animación
+            sleep(0.1) # Pausa para animación
         
         sleep(1)
+        
         
         # Recorrido por el camino DFS
         print("Mostrando búsqueda DFS...")
@@ -330,9 +337,10 @@ class Maze:
             
             pantalla.blit(mario_scaled, (x, y)) # Dibuja a Mario en la posición actual
             pygame.display.update() # Actualiza la pantalla
-            sleep(0.05) # Pausa para animación
+            sleep(0.1) # Pausa para animación
         
         sleep(1)
+        
         
         # Recorrido por el camino óptimo
         print("Mostrando camino óptimo...")
@@ -367,7 +375,7 @@ class Maze:
             sleep(0.1) # Pausa para animación
     
 
-        while True:
+        while True: # Bucle principal para mantener la ventana abierta
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
             for event in pygame.event.get(): # Recorre todos los eventos
