@@ -239,101 +239,141 @@ class Maze:
         #print(f"Camino de búsqueda BFS: {bfs_search_path}")
 
     def get_dfs_path(self):
-        return self.path
+        return self.path # Retorna el camino DFS encontrado
 
     def get_bfs_path(self):
-        return self.bfs_result 
+        return self.bfs_result  # Retorna el camino BFS encontrado
     
 
     def main(self):
-        pygame.init()
-        pantalla = pygame.display.set_mode((600,600))
-        rect_height = 600/self.height
-        rect_width = 600/self.width
-        pantalla.fill((255,255,255))
-        turquoise = (83,195,189)
-        white = (255,255,255)
-        black = (0,0,0)
-        red = (255,0,0)
-        green = (0,255,0)
-
-        for i in range(self.height):
-            lista = list()
-            for j in range(self.width):
-                pos = (rect_height*i,rect_width*j,rect_height,rect_width)
-
-                match self.matrix[i][j]:
-                    case "0":
-                        lista.append(pygame.draw.rect(pantalla,white,pos))
-                    case "1":
-                        lista.append(pygame.draw.rect(pantalla,black,pos))
-                    case "A":
-                        lista.append(pygame.draw.rect(pantalla,red,pos))
-                    case "B":
-                        lista.append(pygame.draw.rect(pantalla,green,pos))
-
+        pygame.init() # Inicializa pygame lol
+        pantalla = pygame.display.set_mode((1000,1000)) # Tamaño de la ventana en píxeles
+        rect_height = 1000/self.height # Tamaño de cada casilla en altura "Y"
+        rect_width = 1000/self.width # Tamaño de cada casilla en anchura "X"
+        pantalla.fill((115,214,41)) # Fondo verde pasto
+        
+        start = (255, 0, 0) # Rojo para el inicio
+        # Cargar las imágenes (FUERA DEL BUCLE) o vale morisqueta
+        mario_img = pygame.image.load("images/mario.png")
+        arbusto_img = pygame.image.load("images/arbusto.png")
+        path_img = pygame.image.load("images/path.jpg")
+        castle_img = pygame.image.load("images/castle.png")
+        
+        
+        # Escalar las imágenes al tamaño de la casilla para que no se vean feas y diminutas
+        tamano_casilla = (int(rect_width), int(rect_height)) # Tamaño de cada casilla en píxeles como tupla
+        mario_scaled = pygame.transform.scale(mario_img, tamano_casilla) # Escala la imagen de Mario usando la tupla de tamaño_casilla
+        arbusto_scaled = pygame.transform.scale(arbusto_img, tamano_casilla) # Escala la imagen del arbusto usando la tupla de tamaño_casilla
+        path_scaled = pygame.transform.scale(path_img, tamano_casilla) # Escala la imagen del camino usando la tupla de tamaño_casilla
+        castle_scaled = pygame.transform.scale(castle_img, tamano_casilla) # Escala la imagen del castillo usando la tupla de tamaño_casilla
+        
+        # Recorrido por el camino BFS
+        print("Recorrido por BFS")
+        pantalla.fill((115, 214, 41)) # Fondo verde pasto para reiniciar la pantalla
+        # Dibuja el laberinto
+        for i in range(self.height): # Por cada fila
+            for j in range(self.width): # Por cada columna
+                x = rect_width * j # Posición en X
+                y = rect_height * i # Posición en Y
+                
+                if self.matrix[i][j] == "0": # Si es pared
+                    pantalla.blit(arbusto_scaled, (x, y)) # Dibuja arbusto
+                elif self.matrix[i][j] == "1": # Si es camino
+                    pantalla.blit(path_scaled, (x, y)) # Dibuja camino
+                elif self.matrix[i][j] == "A": # Si es inicio
+                    pantalla.blit(path_scaled, (x, y)) # Dibuja camino
+                elif self.matrix[i][j] == "B": # Si es fin
+                    pantalla.blit(castle_scaled, (x, y)) # Dibuja castillo
+        
+        pygame.display.update() # Actualiza la pantalla
+        sleep(0.8) # Pausa para que se vea bien
+        
+        # Anima el recorrido
+        for i in range(len(self.bfs_path)): # Por cada paso en el camino BFS
+            m, n = self.bfs_path[i] # Coordenadas actuales
+            x = rect_width * n # Posición en X
+            y = rect_height * m # Posición en Y
             
-        for i in range(len(self.bfs_path)):
-            print(i)
-            m,n = self.bfs_path[i]
-            pos = (rect_height*m,rect_width*n,rect_height,rect_width)    
-            pygame.draw.rect(pantalla, turquoise, pos)
-            sleep(0.5)
-            pygame.display.update()
-
-        for i in range(self.height):
-            lista = list()
-            for j in range(self.width):
-                pos = (rect_height*i,rect_width*j,rect_height,rect_width)
-
-                match self.matrix[i][j]:
-                    case "0":
-                        lista.append(pygame.draw.rect(pantalla,white,pos))
-                    case "1":
-                        lista.append(pygame.draw.rect(pantalla,black,pos))
-                    case "A":
-                        lista.append(pygame.draw.rect(pantalla,red,pos))
-                    case "B":
-                        lista.append(pygame.draw.rect(pantalla,green,pos))
-
-        for i in range(len(self.dfs_path)):
-            print(i)
-            m,n = self.dfs_path[i]
-            pos = (rect_height*m,rect_width*n,rect_height,rect_width)    
-            pygame.draw.rect(pantalla, turquoise, pos)
-            sleep(0.5)
-            pygame.display.update()
-
-        for i in range(self.height):
-            lista = list()
-            for j in range(self.width):
-                pos = (rect_height*i,rect_width*j,rect_height,rect_width)
-
-                match self.matrix[i][j]:
-                    case "0":
-                        lista.append(pygame.draw.rect(pantalla,white,pos))
-                    case "1":
-                        lista.append(pygame.draw.rect(pantalla,black,pos))
-                    case "A":
-                        lista.append(pygame.draw.rect(pantalla,red,pos))
-                    case "B":
-                        lista.append(pygame.draw.rect(pantalla,green,pos))
-
-        for i in range(len(self.path)):
-            print(i)
-            m,n = self.path[i]
-            pos = (rect_height*m,rect_width*n,rect_height,rect_width)    
-            pygame.draw.rect(pantalla, turquoise, pos)
-            sleep(0.5)
-            pygame.display.update()
+            pantalla.blit(mario_scaled, (x, y)) # Dibuja a Mario en la posición actual
+            pygame.display.update() # Actualiza la pantalla
+            sleep(0.05) # Pausa para animación
+        
+        sleep(1)
+        
+        # Recorrido por el camino DFS
+        print("Mostrando búsqueda DFS...")
+        pantalla.fill((115, 214, 41)) # Fondo verde pasto para reiniciar la pantalla
+        
+        # Dibuja el  laberinto
+        for i in range(self.height): # Por cada fila
+            for j in range(self.width): # Por cada columna
+                x = rect_width * j # Posición en X
+                y = rect_height * i # Posición en Y
+                
+                if self.matrix[i][j] == "0": # Si es pared
+                    pantalla.blit(arbusto_scaled, (x, y)) # Dibuja arbusto
+                elif self.matrix[i][j] == "1": # Si es camino
+                    pantalla.blit(path_scaled, (x, y)) # Dibuja camino
+                elif self.matrix[i][j] == "A": # Si es inicio
+                    pantalla.blit(path_scaled, (x, y)) # Dibuja camino
+                elif self.matrix[i][j] == "B": # Si es fin
+                    pantalla.blit(castle_scaled, (x, y)) # Dibuja castillo
+        
+        pygame.display.update() # Actualiza la pantalla
+        sleep(0.5) # Pausa para que se vea bien
+        
+        # Animar recorrido
+        for i in range(len(self.dfs_path)): # Por cada paso en el camino DFS
+            m, n = self.dfs_path[i] # Coordenadas actuales
+            x = rect_width * n # Posición en X
+            y = rect_height * m # Posición en Y
+            
+            pantalla.blit(mario_scaled, (x, y)) # Dibuja a Mario en la posición actual
+            pygame.display.update() # Actualiza la pantalla
+            sleep(0.05) # Pausa para animación
+        
+        sleep(1)
+        
+        # Recorrido por el camino óptimo
+        print("Mostrando camino óptimo...")
+        pantalla.fill((115, 214, 41))
+        
+        # Dibuja el laberinto base
+        for i in range(self.height): # Por cada fila
+            for j in range(self.width): # Por cada columna
+                x = rect_width * j # Posición en X
+                y = rect_height * i # Posición en Y
+                
+                if self.matrix[i][j] == "0": # Si es pared
+                    pantalla.blit(arbusto_scaled, (x, y)) # Dibuja arbusto
+                elif self.matrix[i][j] == "1": # Si es camino
+                    pantalla.blit(path_scaled, (x, y)) # Dibuja camino
+                elif self.matrix[i][j] == "A": # Si es inicio
+                    pantalla.blit(path_scaled, (x, y)) # Dibuja camino
+                elif self.matrix[i][j] == "B": # Si es fin
+                    pantalla.blit(castle_scaled, (x, y)) # Dibuja castillo
+        
+        pygame.display.update() # Actualiza la pantalla
+        sleep(0.5) # Pausa para que se vea bien
+        
+        # Anima el recorrido
+        for i in range(len(self.path)): # Por cada paso en el camino óptimo
+            m, n = self.path[i] # Coordenadas actuales
+            x = rect_width * n # Posición en X
+            y = rect_height * m # Posición en Y
+            
+            pantalla.blit(mario_scaled, (x, y)) # Dibuja a Mario en la posición actual
+            pygame.display.update() # Actualiza la pantalla
+            sleep(0.1) # Pausa para animación
+    
 
         while True:
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    running = False
+            for event in pygame.event.get(): # Recorre todos los eventos
+                if event.type == pygame.QUIT: # Si el evento es cerrar la ventana
+                    pygame.quit()  # Cierra pygame
+                    running = False # Termina el bucle principal
             
 
 # Ya aquí es donde se pone el laberintyo y se resuelve :v
