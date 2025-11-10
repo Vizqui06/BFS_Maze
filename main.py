@@ -385,12 +385,14 @@ class Maze: # Clase que maneja todo el laberinto y su solución
             
 
 # Ya aquí es donde se pone el laberintyo y se resuelve :v
+# La primera linea son filas y columnas
+# Las siguientes líneas son el laberinto en sí (0 = pared, 1 = camino, A = inicio, B = fin)
 
-input = """4 4
-B100
-0101
-0111
-110A"""
+id_del_archivo = 3 # Cambiar este número para probar diferentes archivos de laberintos
+
+archivo = f"./laberintos/laberinto_{id_del_archivo}.in.txt" # Ruta del archivo de laberinto
+with open(archivo, 'r') as f: # Abre el archivo en modo lectura
+    input = f.read() # Lee todo el contenido del archivo
 
 
 # El objeto maze para que se use en la clase con el input
