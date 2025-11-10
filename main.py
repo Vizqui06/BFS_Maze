@@ -274,7 +274,7 @@ class Maze: # Clase que maneja todo el laberinto y su solución
         
         
         # Recorrido por el camino BFS
-        print("Recorrido por BFS")
+        print("Mostrando camino por BFS")
         pantalla.fill((115, 214, 41)) # Fondo verde pasto para reiniciar la pantalla
         # Dibuja el laberinto
         for i in range(self.height): # Por cada fila
@@ -302,13 +302,13 @@ class Maze: # Clase que maneja todo el laberinto y su solución
             
             pantalla.blit(mario_scaled, (x, y)) # Dibuja a Mario en la posición actual
             pygame.display.update() # Actualiza la pantalla
-            sleep(0.1) # Pausa para animación
+            sleep(0.01) # Pausa para animación
         
         sleep(1)
         
         
         # Recorrido por el camino DFS
-        print("Mostrando búsqueda DFS...")
+        print("Mostrando camino por DFS...")
         pantalla.fill((115, 214, 41)) # Fondo verde pasto para reiniciar la pantalla
         
         # Dibuja el  laberinto
@@ -337,16 +337,46 @@ class Maze: # Clase que maneja todo el laberinto y su solución
             
             pantalla.blit(mario_scaled, (x, y)) # Dibuja a Mario en la posición actual
             pygame.display.update() # Actualiza la pantalla
-            sleep(0.1) # Pausa para animación
+            sleep(0.01) # Pausa para animación
         
         sleep(1)
         
         
         # Recorrido por el camino óptimo
-        print("Mostrando camino óptimo...")
+        print("Mostrando caminos óptimos...")
         pantalla.fill((115, 214, 41))
         
         # Dibuja el laberinto base
+        for i in range(self.height): # Por cada fila
+            for j in range(self.width): # Por cada columna
+                x = rect_width * j # Posición en X
+                y = rect_height * i # Posición en Y
+                
+                if self.matrix[i][j] == "0": # Si es pared
+                    pantalla.blit(arbusto_scaled, (x, y)) # Dibuja arbusto
+                elif self.matrix[i][j] == "1": # Si es camino
+                    pantalla.blit(path_scaled, (x, y)) # Dibuja camino
+                elif self.matrix[i][j] == "A": # Si es inicio
+                    pantalla.blit(path_scaled, (x, y)) # Dibuja camino
+                elif self.matrix[i][j] == "B": # Si es fin
+                    pantalla.blit(castle_scaled, (x, y)) # Dibuja castillo
+        
+        pygame.display.update() # Actualiza la pantalla
+        sleep(0.5) # Pausa para que se vea bien
+        
+        
+        for i in range(len(self.bfs_result)): # Por cada paso en el camino óptimo
+            m, n = self.bfs_result[i] # Coordenadas actuales
+            x = rect_width * n # Posición en X
+            y = rect_height * m # Posición en Y
+            
+            pantalla.blit(mario_scaled, (x, y)) # Dibuja a Mario en la posición actual
+            pygame.display.update() # Actualiza la pantalla
+            sleep(0.01) # Pausa para animación
+            
+        pygame.display.update() # Actualiza la pantalla
+        sleep(0.5) # Pausa para que se vea bien
+            
         for i in range(self.height): # Por cada fila
             for j in range(self.width): # Por cada columna
                 x = rect_width * j # Posición en X
@@ -372,7 +402,7 @@ class Maze: # Clase que maneja todo el laberinto y su solución
             
             pantalla.blit(mario_scaled, (x, y)) # Dibuja a Mario en la posición actual
             pygame.display.update() # Actualiza la pantalla
-            sleep(0.1) # Pausa para animación
+            sleep(0.01) # Pausa para animación
     
 
         while True: # Bucle principal para mantener la ventana abierta
